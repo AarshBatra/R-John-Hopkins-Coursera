@@ -46,7 +46,50 @@ errorMessageReturn <- function(input) {
     }
 }
 
+# We can write a separate function to check that the packages are installed.
 
+check_pkg_deps <- function() {
+  if(!require(readr)) {
+    message("installing the 'readr' package")
+    install.packages("readr")
+  }
+  if(!require(dplyr))
+    stop("the 'dplyr' package needs to be installed first")
+}
 
+# Write all of the above on your own-------------
+
+num_download_v2 <- function(pkgName, dateInput = "2019-10-19"){
+  check_pkg_deps()
+  dsList <- list()
+  for(i in 1:length(dateInput)){
+    year <- stringr::str_sub(dateInput[i], 1, 4)
+    srcLink <- sprintf("http://cran-logs.rstudio.com/%s/%s.csv.gz",
+                       year, dateInput[i])
+    
+    filePath <- basename(srcLink) # relative to the cwd
+    if(!(file.exists(filePath))){
+      download.file(srcLink, filePath)
+      dsList[[i]] <- read_csv(filePath, col_types = "ccicccccci")
+      
+    } else {
+      dsList[[i]] <- read_csv(filePath, col_types = "ccicccccci")
+    }
+  }
+  
+  finTibble <- dsList[[1]]
+  for(j in 1:length(dsList)){
+    if(length(dsList) == 1){
+     break 
+    } else {
+      finTibble <- rbind(finTibble,  dsList[[j + 1]])
+      if((j + 1) == length(dsList)){
+        break
+      }
+    }
+  }
+  
+  finTibble %>% filter(package %in% pkgName) %>% group_by(package, date) %>% summarise(count = n())
+}
 
 
