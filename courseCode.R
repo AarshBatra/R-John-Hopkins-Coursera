@@ -10,8 +10,9 @@ library(readr)
 # logs from the RStudio server, reads the CSV file, and then returns the number of downloads 
 # for the package.
 
+# Note the default value of the date variable
 
-num_download <- function(pkgname, date = "2017-07-07") { # Note the default value of the date variable
+num_download <- function(pkgname, date = "2017-07-07") { 
   ## Construct web URL
   year <- substr(date, 1, 4)
   src <- sprintf("http://cran-logs.rstudio.com/%s/%s.csv.gz",
@@ -23,8 +24,13 @@ num_download <- function(pkgname, date = "2017-07-07") { # Note the default valu
   ## Don't download if the file is already there!
   if(!file.exists(dest))
     download.file(src, dest, quiet = TRUE)
+
+  # with column types you can control how your input is rendered in R (when read in). 
+  # This is especially useful when you are reading from multiple sources with different date
+  # formats, and you can read all of that into a single common date format, by using this col_types 
+  # function.
   
-  cran <- read_csv(dest, col_types = "ccicccccci", progress = FALSE)
+  cran <- read_csv(dest, col_types = "ccicccccci", progress = FALSE) 
   cran %>% filter(package == pkgname) %>% nrow
 }
 
