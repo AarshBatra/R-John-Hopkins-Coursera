@@ -66,4 +66,20 @@ foo5 <- world.cities.summ  %>%
 foo5 %>% ggplot() + geom_polygon(mapping = aes(x = long, y = lat, group = group, fill = popSum), color = "black") +
   theme_void() + scale_fill_viridis(name = "Population Heat Map")
 
+ 
+# Grid Graphics
+
+library(grid)
+
+candy <- grid.circle()
+stick <- segmentsGrob(x0 = 0.5, x1 = 1, y0 = 0.5, y1 = 1) 
+
+grid.draw(rectGrob())
+sample_vp <- viewport(x = 0.5, y = 0.5, 
+                      width = 0.5, height = 0.5,
+                      just = c("left", "bottom"))
+pushViewport(sample_vp)
+grid.draw(roundrectGrob())
+grid.draw(lollipop)
+popViewport()
 

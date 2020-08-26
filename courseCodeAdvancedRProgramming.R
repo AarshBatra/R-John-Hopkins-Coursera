@@ -40,3 +40,86 @@ options(error = recover)
 
 # check how to untrace a function
 # profiling
+
+# object oriented programming
+
+shape_s3 <- function(sideLengths){
+  structure(list(sideLengths = sideLengths), class = "shape_s3")
+}
+
+triangle <- shape_s3(c(1, 1, 1))
+square <- shape_s3(c(1, 1, 1, 1))
+pentagon <- shape_s3(c(1, 2, 3, 4, 5))
+
+isSquare <- function(x) UseMethod("isSquare")
+
+isSquare.shape_s3 <- function(x){
+  (length(x$sideLengths) == 4) &&
+    (x$sideLengths[1] == x$sideLengths[2]) &&
+    (x$sideLengths[2] == x$sideLengths[3]) &&
+    (x$sideLengths[3] == x$sideLengths[4])
+}
+
+isEquilateralTriangle <- function(x) UseMethod("isEquilateralTriangle")
+
+isEquilateralTriangle.shape_s3 <- function(x){
+  (length(x$sideLengths) == 3) &&
+    (x$sideLengths[1] == x$sideLengths[2]) &&
+    (x$sideLengths[2] == x$sideLengths[3])
+}
+
+isEquilateralTriangle(triangle)
+
+isEquilateralTriangle.default <- function(x){
+  NA
+}
+
+#----------------------------------------------
+
+shapeDetect <- function(x){
+  structure(baseNameOfShape = baseNameOfShape, class = "shapeDetect")
+}
+
+eqTriangle <- shapeDetect(c("Triangle"))
+
+isShape <- function(x){
+  UseMethod("isShape")
+}  
+
+isShape.shapeDetect <- function(x){
+  
+}
+
+# Reference Classes practice
+
+Aarsh <- setRefClass("Aarsh", fields = list(height = "numeric",
+                     nn = "character", weight = "numeric"), 
+                     methods =  list(
+                       hello = function(){
+                         paste("My Nick Name is", nn)
+                       }, 
+                       weight = function(){
+                         paste("Weight: ", weight )
+                       }
+                     ))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
