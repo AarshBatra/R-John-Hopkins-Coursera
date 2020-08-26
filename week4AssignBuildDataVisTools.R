@@ -214,3 +214,10 @@ x <- get_map("Louisiana", zoom = 6, maptype = "toner-background") %>%
   scale_fill_manual(name = "Wind speed (kts)", 
                     values = c("red", "orange", "yellow")) -> hurricane_ike
 
+
+ggmap(Louis) + geom_hurricane(data = ext_tracks_tidy_IKE,
+                              aes(x = longitude, y = latitude, 
+                                  ne = ne, se = se, nw = nw, sw = sw,
+                                  fill = windSpeed, color = windSpeed, alpha = 0.5, scale_radii = 1))
+
+
