@@ -1,0 +1,20 @@
+# Building R Packages practice code--------------------------------------------
+
+# libraries
+library(swirl)
+library(dplyr)
+library(stringr)
+library(magrittr)
+library(ggplot2)
+library(microbenchmark)
+library(purrr)
+library(readr)
+library(tidyr)
+library(gridExtra)
+library(plotly)
+library(lubridate)
+library(geosphere)
+library(grid)
+library(ggmap)
+library(roxygen2)
+library(devtools)
