@@ -89,8 +89,7 @@ setMethod("summary", c(x = "longitudnalData", "data.frame"),
 
 
 
-
-
+kjaskj
 
 
 
