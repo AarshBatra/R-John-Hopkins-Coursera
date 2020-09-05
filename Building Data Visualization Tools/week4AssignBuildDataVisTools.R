@@ -28,29 +28,30 @@ library(devtools)
 #' @importFrom readr read_fwf
 #' @param fullPathToDataFile Path to the file where data is stored
 #' @examples 
-#' loadHurrData(fullPathToDataFile = 
-#' "C:/Users/Desktop/R/Coursera/Data Vis Course/Data/ebtrk_atlc_1988_2015.txt")
+#' 
 
 
 loadHurrData <- function(fullPathToDataFile){
   if(file.exists(fullPathToDataFile) == TRUE){
-    ext_tracks_widths <- c(7, 10, 2, 2, 3, 5, 5, 6, 4, 5, 4, 4, 5, 3, 4, 3, 3, 3,
+    ext_tracks_widths <- c(7, 10, 2, 2, 3, 5, 5, 6, 4, 
+                           5, 4, 4, 5, 3, 4, 3, 3, 3,
                            4, 3, 3, 3, 4, 3, 3, 3, 2, 6, 1)
     ext_tracks_colnames <- c("storm_id", "storm_name", "month", "day",
                              "hour", "year", "latitude", "longitude",
                              "max_wind", "min_pressure", "rad_max_wind",
                              "eye_diameter", "pressure_1", "pressure_2",
-                             paste("radius_34", c("ne", "se", "sw", "nw"), sep = "_"),
-                             paste("radius_50", c("ne", "se", "sw", "nw"), sep = "_"),
-                             paste("radius_64", c("ne", "se", "sw", "nw"), sep = "_"),
+                    paste("radius_34", c("ne", "se", "sw", "nw"), sep = "_"),
+                    paste("radius_50", c("ne", "se", "sw", "nw"), sep = "_"),
+                    paste("radius_64", c("ne", "se", "sw", "nw"), sep = "_"),
                              "storm_type", "distance_to_land", "final")
     
-    ext_tracks <- read_fwf("ebtrk_atlc_1988_2015.txt", 
+    ext_tracks <- readr::read_fwf("ebtrk_atlc_1988_2015.txt", 
                            fwf_widths(ext_tracks_widths, ext_tracks_colnames),
                            na = "-99")
     ext_tracks
   } else {
-    stop("File not found, recheck the path entered in the loadHurrData function!")
+    stop("File not found, recheck the path entered in the 
+         loadHurrData function!")
   }
 }
 
@@ -98,7 +99,7 @@ tidyRawHurrData <- function(rawHurrData){
   # provided
   
   ext_tracks$longitude <- as.numeric(ext_tracks$longitude)
-  ext_tracks$longitude <- map(ext_tracks$longitude, function(x){
+  ext_tracks$longitude <- purrr::map(ext_tracks$longitude, function(x){
     if(x < 0){
       x
     } else{
@@ -109,33 +110,35 @@ tidyRawHurrData <- function(rawHurrData){
   # creating a date time column from existing columns
   
   # changing relevant columns to type numeric
-  ext_tracks <- mutate(ext_tracks, month = as.numeric(month), 
+  ext_tracks <- dplyr::mutate(ext_tracks, month = as.numeric(month), 
                        year = as.numeric(year), day = as.numeric(day), 
                        hour =  as.numeric(hour)) 
   
   # adding a date_time column
-  ext_tracks <- ext_tracks %>% mutate(
+  ext_tracks <- ext_tracks %>% dplyr::mutate(
     date_time = lubridate::make_datetime(year = year, 
-                                         month = month, day = day, hour = hour, tz = "UTC")
+                    month = month, day = day, hour = hour, tz = "UTC")
   )
   
   # Convert data to a long format with separate rows for each wind speed
   
   # Creating 2 columns: wind speed and direction (making data longer)
-  ext_tracks <- ext_tracks %>% pivot_longer(cols = radius_34_ne: radius_64_nw,   
-                                            names_to = c("windSpeed", "direc"), 
-                                            names_pattern = "radius_(..)_(..)",
-                                            values_to = "radiiGivenDirec")
+  ext_tracks <- ext_tracks %>%
+    tidyr::pivot_longer(cols = radius_34_ne: radius_64_nw,   
+                                      names_to = c("windSpeed", "direc"), 
+                                      names_pattern = "radius_(..)_(..)",
+                                      values_to = "radiiGivenDirec")
   
   # Making a column for each  of 4 directions (making data wider)
-  ext_tracks_tidy <- ext_tracks %>% pivot_wider(names_from = direc, 
-                                                values_from = "radiiGivenDirec")
+  ext_tracks_tidy <- ext_tracks %>% tidyr::pivot_wider(names_from = direc, 
+                                      values_from = "radiiGivenDirec")
   
   # Note: Both of the above steps result in the type of dataset as 
   # required in the assignment instructions.
   
-  # Rearranging columns in the tidy dataset (putting most relevant colums in the start)
-  ext_tracks_tidy <- ext_tracks_tidy %>% select(
+  # Rearranging columns in the tidy dataset (putting most relevant colums 
+  # in the start)
+  ext_tracks_tidy <- ext_tracks_tidy %>% dplyr::select(
     storm_id, storm_name, date_time, latitude, longitude, windSpeed, 
     ne, se, nw, sw, everything()
   )
@@ -157,16 +160,18 @@ tidyRawHurrData <- function(rawHurrData){
 #'        \code{tidyRawHurrData} function.
 #' @param stormName the name of the storm for which the data is needed. This
 #'        should be a character vector of length 1. 
-#' @param dateTime this is the \code{date_time} to pick a single instance of the
-#'        \code{stormName}, a single observation time. This should be a character
-#'        vector of length 1.        
+#' @param dateTime this is the \code{date_time} to pick a single instance 
+#'        of the \code{stormName}, a single observation time. This should be
+#'        a character vector of length 1.
+#'            
 #' @examples 
 #' subsetTidyHurrData(tidiedHurrDataset = tidyDatasetName, stormName = "IKE", 
 #' dateTime = c("2018-09-13 12:00:00"))          
 
 
 subsetTidyHurrData <- function(tidiedHurrDataset, stormName, dateTime){
-  ext_tracks_tidy_IKE <- filter(tidiedHurrDataset,  storm_name %in% stormName, 
+  ext_tracks_tidy_IKE <- dplyr::filter(tidiedHurrDataset,  
+                                stormName %in% storm_name, 
                                 date_time == as_datetime(dateTime))
 }
 
@@ -203,7 +208,7 @@ draw_panel_function <- function(data, panel_scales, coord){
   # converting radii columns (corresponding to each direction) into meters
   # and further scaling it by the "scale_radii" parameter.
   data <- data %>% 
-    mutate(ne = ne * nautMileInMeters * scale_radii, 
+    dplyr::mutate(ne = ne * nautMileInMeters * scale_radii, 
            se = se * nautMileInMeters * scale_radii, 
            nw = nw * nautMileInMeters * scale_radii, 
            sw = sw * nautMileInMeters * scale_radii)
@@ -258,7 +263,7 @@ draw_panel_function <- function(data, panel_scales, coord){
   
   # renaming longitude and latitude columns
   finDf <- finDf %>%
-    rename(x = lon, 
+    dplyr::rename(x = lon, 
            y = lat)
   
   # converting the "colour" and "fill" columns to type character
@@ -274,16 +279,18 @@ draw_panel_function <- function(data, panel_scales, coord){
   polygonGrob(
     x = coords_df$x, 
     y = coords_df$y, 
-    gp = gpar(col = coords_df$colour, fill = coords_df$fill, alpha = coords_df$alpha)
+    gp = grid::gpar(col = coords_df$colour, 
+                    fill = coords_df$fill, alpha = coords_df$alpha)
   )
   
 }
 
 # creating an object named GeomHurricane which is the basis for the 
 # geom_hurricane function
-GeomHurricane <- ggproto("GeomHurricane", Geom, 
+GeomHurricane <- ggplot2::ggproto("GeomHurricane", Geom, 
                          required_aes = c("x", "y", "ne", "se", "nw", "sw"), 
-                         default_aes = aes(fill = 1, colour = 1, alpha = 1, scale_radii = 1), 
+                         default_aes = aes(fill = 1, colour = 1, 
+                         alpha = 1, scale_radii = 1), 
                          draw_key = draw_key_polygon, 
                          draw_group = draw_panel_function)
 
@@ -309,14 +316,30 @@ geom_hurricane <- function(mapping = NULL, data = NULL,
 }
 
 
+# using the above functions to load, tidy, subset and-------------------------- 
+# plot the hurricane data
+
+# loading hurricane data
+rawHurrData <- loadHurrData(fullPathToDataFile = "C:/Users/Aarsh Batra/Desktop/GitHub/R John Hopkins Coursera/Building Data Visualization Tools/ebtrk_atlc_1988_2015.txt")
+
+# tidying hurricane data
+tidiedHurrData <- tidyRawHurrData(rawHurrData = rawHurrData)
+
+# subset tidy data to get data for a single observation 
+# time for Hurricane "IKE"
+
+ext_tracks_tidy_IKE <- subsetTidyHurrData(tidiedHurrDataset = tidiedHurrData,
+                  stormName = "IKE", dateTime = c("2008-09-13 12:00:00")) 
 
 
-x <- get_map("Louisiana", zoom = 6, maptype = "toner-background") %>%
+# Map showing wind_radii overlayed for Hurricane IKE
+x <- ggmap::get_map("Louisiana", zoom = 6, maptype = "toner-background") %>%
   ggmap(extent = "device") +
   geom_hurricane(data = ext_tracks_tidy_IKE,
                  aes(x = longitude, y = latitude, 
                      ne = ne, se = se, nw = nw, sw = sw,
-                     fill = windSpeed, color = windSpeed, alpha = 0.5, scale_radii = 1)) + 
+                     fill = windSpeed, color = windSpeed, alpha = 0.5, 
+                     scale_radii = 1)) + 
   guides(alpha = FALSE) +
   theme(legend.justification=c(1,0), legend.position=c(0.97,0.03)) +
   
@@ -326,9 +349,9 @@ x <- get_map("Louisiana", zoom = 6, maptype = "toner-background") %>%
                     values = c("red", "orange", "yellow")) -> hurricane_ike
 
 
-ggmap(Louis) + geom_hurricane(data = ext_tracks_tidy_IKE,
-                              aes(x = longitude, y = latitude, 
-                                  ne = ne, se = se, nw = nw, sw = sw,
-                                  fill = windSpeed, color = windSpeed, alpha = 0.5, scale_radii = 1))
-
+# ggmap("Louis") + geom_hurricane(data = ext_tracks_tidy_IKE,
+#                   aes(x = longitude, y = latitude, 
+#                  ne = ne, se = se, nw = nw, sw = sw,
+#          fill = windSpeed, color = windSpeed, alpha = 0.5, scale_radii = 1))
+# 
 

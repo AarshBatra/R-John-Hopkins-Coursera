@@ -5,6 +5,7 @@ source("oop_code.R")
 ## Load any other packages that you may need to execute your code
 
 data <- read_csv("./data/MIE.csv")
+sink(file = "./oop_output.txt")
 x <- make_LD(data)
 print(class(x))
 print(x)
@@ -31,3 +32,5 @@ print(out)
 
 out <- subject(x, 44) %>% visit(1) %>% room("living room") %>% summary
 print(out)
+
+sink()

@@ -1,7 +1,7 @@
-# Assignment Part 1: Factorial function--------------------
+# Assignment Part 1: Factorial function----------------------------------------
 
 
-# packages-------------------------------------------------
+# packages---------------------------------------------------------------------
 library(dplyr)
 library(stringr)
 library(magrittr)
@@ -13,10 +13,10 @@ library(tidyr)
 library(gridExtra)
 library(plotly)
 
-# Version 1 (Factorial Loop)-----------------------------
+# Version 1 (Factorial Loop)---------------------------------------------------
 
 Factorial_loop <- function(n) {
-  stopifnot(n >= 0)
+  stopifnot(n >= 0) # input to the factorial function should be a whole number. 
   
   if(n == 0){
     return(1)
@@ -31,7 +31,7 @@ Factorial_loop <- function(n) {
   facAns
 }
 
-# Version 2 (Factorial Reduce)-----------------------------
+# Version 2 (Factorial Reduce)-------------------------------------------------
 
 Factorial_reduce <- function(n){
   stopifnot(n >= 0)
@@ -57,7 +57,10 @@ Factorial_func <- function(n){
 
 # Version 4 (Factorial Recursion using Memoization)----------------------------
 
+# setting up the memoization table
 facMemTable <- c(1, c(rep(NA, times = 9)))
+
+# memoization function
 Factorial_mem <- function(n){
   stopifnot(n >= 0)
   if(n == 0){
@@ -88,10 +91,10 @@ getProfFunData <- function(fun, funcTypeName){
     summarise(med_time = median(time)) %>% 
     mutate(funcType = funcTypeName)
   
-  fac_data_sum
+  fac_data
 }
 
-# using the function to get a dataset cooresponding to each function
+# using the function to get benchmarks datasets cooresponding to each function
 facLoopData <- getProfFunData(Factorial_loop, "for loop")
 facReduceData <- getProfFunData(Factorial_reduce, "Reduce")
 facRecursionData <- getProfFunData(Factorial_func, "Recursion")
@@ -103,8 +106,14 @@ profDataset <- rbind(facLoopData, facReduceData, facRecursionData,
                      facMemoizationData)
 
 # changing colnames of the profiling dataset
-colnames(profDataset) <- c("Number", "Median Time", "Function Type")
+colnames(profDataset) <- c("Number", "Median Time (in nanoseconds)", "Function Type")
+
+
+# making the profDataset wider for ease in interpretation----------------------
+profDatasetWider <- profDataset %>%
+  pivot_wider(names_from = `Function Type`, 
+              values_from = `Median Time (in nanoseconds)`)
 
 # plotting profiling data
-ggplot(profDataset, mapping = aes(x = Number, y = `Median Time`)) + 
+ggplot(profDataset, mapping = aes(x = Number, y = `Median Time (in nanoseconds)`)) + 
   geom_point(mapping = aes(colour = `Function Type`))

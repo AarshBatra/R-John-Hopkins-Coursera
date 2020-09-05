@@ -119,6 +119,7 @@ summary.room <- function(x){
   paste(finOutput)
 }
 
+# testing output---------------------------------------------------------------
 # foo <- make_LD(longData)
 # foo2 <- subject(foo, 54) %>% summary
 # foo3 <- subject(foo, 14) %>% summary
