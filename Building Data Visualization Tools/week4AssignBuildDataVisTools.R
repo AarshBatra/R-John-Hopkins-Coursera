@@ -342,6 +342,7 @@ x <- ggmap::get_map("Louisiana", zoom = 6, maptype = "toner-background") %>%
                      scale_radii = 1)) + 
   guides(alpha = FALSE) +
   theme(legend.justification=c(1,0), legend.position=c(0.97,0.03)) +
+  ggtitle("IKE Storm 2008-09-13 12:00:00") +
   
   scale_color_manual(name = "Wind speed (kts)", 
                      values = c("red4", "orange4", "yellow4")) + 
