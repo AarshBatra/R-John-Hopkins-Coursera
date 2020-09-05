@@ -27,7 +27,7 @@ visit <- function(subjObj, visitNum){
   UseMethod("visit")
 }
 
-room <- function(subjObj, roomNum){
+room <- function(subjObj, roomType){
   UseMethod("room")
 }
 
@@ -93,23 +93,32 @@ visit.subject <- function(subjObj, visitNum){
 
 # function definition: room method for the object of class "visit"
 # returns an object of class "room"
-room.visit <- function(visObj, roomNum){
-  objToRet <- list(visObjList = visObj, roomNum = roomNum)
+room.visit <- function(visObj, roomType){
+  objToRet <- list(visObjList = visObj, roomType = roomType)
   structure(objToRet, class = c("room"))
 }
 
 # function definition: print method for the object of class "room"
 print.room <- function(x){
-  
+  paste("ID:", x[["visObjList"]][["dataList"]][["id"]], "Visit: ", x[["visObjList"]][["visNum"]], "Room: ", x[["roomType"]])
 }
 
 # function definition: summary method for the object of class "room"
 summary.room <- function(x){
-   
+  extData <- x[["visObjList"]][["dataList"]][["data"]]
+  extId <- x[["visObjList"]][["dataList"]][["id"]]
+  extVisit <- x[["visObjList"]][["visNum"]]
+  extRoom <- x[["roomType"]]
+  finOutput <- extData %>% dplyr::filter(id == extId  , visit == extVisit,  room == extRoom) %>%
+    select(value) %>% summary
+  paste(finOutput)
 }
 
 foo <- make_LD(longData)
 foo2 <- subject(foo, 54) %>% summary
 foo3 <- subject(foo, 14) %>% summary
+foo4 <- subject(foo, 44) %>% visit(0) %>% room("bedroom")
+foo5 <- subject(foo, 44) %>% visit(0) %>% room("bedroom") %>% summary
+foo6 <- subject(foo, 44) %>% visit(1) %>% room("living room") %>% summary
 
   
